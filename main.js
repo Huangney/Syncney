@@ -1,4 +1,4 @@
-const { app, BrowserWindow, ipcMain, screen } = require('electron')
+const { app, BrowserWindow, ipcMain, screen, dialog } = require('electron')
 // 导入 Electron 框架里的 app（应用控制）、BrowserWindow（窗口管理）、ipcMain（主进程通信）对象
 const path = require('path')
 // 导入 Node.js 的 path 模块，用于处理文件路径
@@ -32,6 +32,13 @@ function createWindow() {
   win.loadFile('index.html')
   // 启动时自动打开 DevTools
   // win.webContents.openDevTools() 
+  // 监听 F12 打开 DevTools
+  win.webContents.on('before-input-event', (event, input) => {
+      if (input.key === 'F12' && input.type === 'keyDown') {
+          win.webContents.openDevTools();
+      }
+  });
+
   console.log("窗口已创建") 
 }// 创建一个新窗口，窗口大小 800x600，加载 index.html 页面，并指定预加载脚本 preload.js
 
@@ -131,4 +138,48 @@ ipcMain.on('window-maximize', (event) => {
 ipcMain.on('window-close', (event) => {
   const win = BrowserWindow.getFocusedWindow();
   if (win) win.close();
+});
+
+
+/***---<    软件的JSON IO    >---***/
+const fs = require('fs');
+ipcMain.handle('save-json', async (event, filePath, content) => {
+    fs.writeFileSync(filePath, content, 'utf-8');
+})
+ipcMain.handle('read-json', async (event, filePath) => {
+    return fs.readFileSync(filePath, 'utf-8');
+});
+
+ipcMain.handle('select-folder', async () => 
+{
+    const result = await dialog.showOpenDialog({
+        properties: ['openDirectory']
+    });
+
+    if (result.canceled || result.filePaths.length === 0) return null;
+    return result.filePaths[0];
+});
+
+ipcMain.handle('select-file', async () => 
+{
+  const win = BrowserWindow.getFocusedWindow();
+
+  const result = await dialog.showOpenDialog({
+      properties: ['openFile'],
+      filters: [{ name: 'JSON', extensions: ['json'] }]
+  });
+
+  // 恢复主窗口焦点
+  if (win)
+  {
+    win.focus();
+    win.webContents.focus();
+    setTimeout(() => {
+      win.webContents.sendInputEvent({ type: 'keyDown', keyCode: 'A' });
+      win.webContents.sendInputEvent({ type: 'keyUp', keyCode: 'A' });
+    }, 100);
+  } 
+    
+    if (result.canceled || result.filePaths.length === 0) return null;
+    return result.filePaths[0];
 });

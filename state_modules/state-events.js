@@ -45,10 +45,10 @@ function initStateGen()
                 connections = data.connections || [];
                 renderAll();
             } else {
-                alert("文件格式不正确");
+                showAlert("文件格式不正确");
             }
             } catch (err) {
-            alert("JSON 解析失败");
+            showAlert("JSON 解析失败");
             }
         };
         reader.readAsText(file);
@@ -178,6 +178,22 @@ function initStateGen()
         menu.style.display = 'none';
         menuStateId = null;
     });
+
+    // 页面加载时初始化输入框
+    const input = document.getElementById('statemachine-name');
+
+    // 输入框内容变化时同步到变量
+    if (input)
+    {
+        input.value = window.getStatemachineName ? window.getStatemachineName() : "StateMachine";
+        input.addEventListener('input', function() 
+        {
+        let val = this.value.replace(/[^A-Za-z0-9_]/g, ''); // 只允许英文、数字、下划线
+        if (val.length > 16) val = val.slice(0, 16);
+        this.value = val;
+        if (window.setStatemachineName) window.setStatemachineName(val);
+        });
+    }
 
     renderAll();
 }

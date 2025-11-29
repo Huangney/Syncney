@@ -1,7 +1,6 @@
 // 串口是否已经打开
 let isPortOpen = false;
 
-
 /**
  * @brief 切换按钮关闭 / 打开的状态的按钮
  */
@@ -44,7 +43,7 @@ async function openPortAsync(Button, portSelect)
   // 根据结果更改按钮状态
   if (!result.success) // 失败则弹窗警告
   {
-    alert("串口打开失败：" + result.message);
+    showAlert("串口打开失败：" + result.message);
     Button.disabled = false;                 // 恢复按钮可用
     Button.textContent = "打开串口";           // 恢复按钮文字
   }
@@ -80,7 +79,7 @@ async function closePortAsync(Button, portSelect)
     isPortOpen = false;
 
     // 弹窗
-    alert("串口关闭成功");
+    showAlert("串口关闭成功");
     // 恢复文本
     Button.textContent = "打开串口";
     // 解禁按钮
@@ -91,7 +90,7 @@ async function closePortAsync(Button, portSelect)
   }
   else
   {
-    alert("串口未打开或关闭失败");
+    showAlert("串口未打开或关闭失败");
     Button.disabled = false;
   }
 }
@@ -158,28 +157,29 @@ async function switchPage(page)
   const fs = await fetch(pageFile);
   main.innerHTML = await fs.text();
 
-  // 对于不同的页面，重新绑定事件，同时刷新页面
+  // 先加载通用的脚本
+  const commonScriptSrc = 'common_modules/common_func.js';
+
+  if (!document.querySelector(`script[src="${commonScriptSrc}"]`)) 
+  {
+    const s = document.createElement('script');
+    s.src = commonScriptSrc;
+    document.body.appendChild(s);
+    await new Promise((resolve, reject) =>
+    {
+      s.onload = resolve;
+      s.onerror = () => reject(new Error('加载 common_func.js 失败'));
+    });
+  }
+
+  // 串口页面
   if (page === "serial") 
   {
     refreshPortList();
-
-    // 好像有HTML自身绑定，这里注释掉避免重复绑定
-
-    // // 绑定按钮事件
-    // const btn = document.getElementById("toggle_port_button");
-    // if (btn) btn.onclick = togglePort;
-
-    // // 绑定发送按钮事件
-    // const sendBtn = main.querySelector('button[onclick="sendData()"]');
-    // if (sendBtn) sendBtn.onclick = sendData;
-
-    // // 绑定串口数据监听
-    // window.serialAPI.onData((msg) => {
-    //   const recv = document.getElementById("recv");
-    //   if (recv) recv.value += msg;
-    // });
   }
-  else if (page === "state_generate")   // 如果是状态机页面，动态加载并初始化脚本（只加载一次）
+
+  // 如果是状态机页面，动态加载并初始化脚本（只加载一次）
+  else if (page === "state_generate")   
   {
     // 依次加载依赖脚本
     const scripts = [

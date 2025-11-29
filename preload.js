@@ -13,5 +13,9 @@ contextBridge.exposeInMainWorld('serialAPI', {
 contextBridge.exposeInMainWorld('windowAPI', {
   minimize: () => ipcRenderer.send('window-minimize'),
   maximize: () => ipcRenderer.send('window-maximize'),
-  close: () => ipcRenderer.send('window-close')
+  close: () => ipcRenderer.send('window-close'),
+  saveJson: (filePath, content) => ipcRenderer.invoke('save-json', filePath, content),
+  readJson: (filePath) => ipcRenderer.invoke('read-json', filePath),
+  selectFolder: () => ipcRenderer.invoke('select-folder'),
+  selectFile: () => ipcRenderer.invoke('select-file'),
 });

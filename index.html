@@ -81,6 +81,44 @@
         flex-direction: column;
         min-width: 0;
       }
+
+      /*----------- 自定义弹窗样式--------- */
+      #custom-alert {
+        display: none;
+        position: fixed;
+        left: 0;
+        top: 0;
+        width: 100vw;
+        height: 100vh;
+        z-index: 99999;
+        background: rgba(0, 0, 0, 0.15);
+      }
+      #custom-alert > div {
+        position: absolute;
+        left: 50%;
+        top: 40%;
+        transform: translate(-50%, -50%);
+        background: #fff;
+        border-radius: 10px;
+        box-shadow: 0 2px 16px #aaa;
+        padding: 32px 24px 16px 24px;
+        min-width: 220px;
+        text-align: center;
+      }
+      #custom-alert-msg {
+        font-size: 1.1em;
+        margin-bottom: 18px;
+      }
+      #custom-alert-btn {
+        padding: 6px 24px;
+        border-radius: 6px;
+        border: none;
+        background: #2d7be5;
+        color: #fff;
+        font-size: 1em;
+        cursor: pointer;
+      }
+
     </style>
   </head>
 
@@ -108,6 +146,15 @@
         <!-- 内容将由不同页面填充 -->
       </div>
     </div>
+
+    <!-- 自定义弹窗 -->
+    <div id="custom-alert" style="display:none;">
+      <div>
+        <div id="custom-alert-msg"></div>
+        <button id="custom-alert-btn">确定</button>
+      </div>
+    </div>
+
     <script src="./renderer.js"></script>
     <script>
       document.getElementById('min-btn').onclick = () => window.windowAPI.minimize();
