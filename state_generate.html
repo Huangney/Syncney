@@ -1,0 +1,218 @@
+<style>
+  /* 状态节点样式 */
+  .state-container {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    max-width: none;
+    box-sizing: border-box;
+    height: 100%;
+    padding: 10px;
+    box-sizing: border-box;
+    font-family: 'Segoe UI', sans-serif;
+  }
+
+  /* 标题样式 */
+  .header-title 
+  {
+    font-size: 1.5em;
+    font-weight: bold; /* 加粗 */
+    color: transparent; /* 让文字颜色透明，显示渐变 */
+    background: linear-gradient(90deg, #d6df35, #7f2f8e); /* 黄绿到紫色渐变 */
+    -webkit-background-clip: text;
+    background-clip: text;
+    margin-bottom: 10px;
+    padding-left: 5px;
+    /* border-left: 4px solid #2d7be5;  去掉竖线 */
+}
+
+  /* 画布区域 */
+  .canvas-wrapper {
+    flex: 1;
+    position: relative;
+    background-color: #f8f9fa;
+    background-image: radial-gradient(#e0e0e0 1px, transparent 1px);
+    background-size: 20px 20px; /* 网格背景 */
+    border: 2px solid #dce1e6;
+    width: 100%;
+    min-width: 0px; /* 关键：允许 flex 子项缩小 */
+    max-width: none;
+    box-sizing: border-box;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: inset 0 0 10px rgba(0,0,0,0.05);
+  }
+
+  /* 状态节点样式 */
+  .state-node {
+    position: absolute;
+    min-width: 72px;
+    box-sizing: border-box; /* 与 JS 计算一致时更好 */
+    height: 48px;
+    background: white;
+    border: 2px solid #2d7be5;
+    border-radius: 20px;
+    
+    display: flex;
+    flex-direction: column;
+
+    align-items: center;
+    justify-content: center;
+    padding: 0 15px;
+    cursor: grab;
+    user-select: none;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    transition: transform 0.1s, box-shadow 0.2s;
+    z-index: 10;
+  }
+
+  .state-node:hover {
+    box-shadow: 0 6px 12px rgba(45, 123, 229, 0.2);
+    transform: translateY(-1px);
+  }
+
+  .state-node:active {
+    cursor: grabbing;
+    transform: scale(0.98);
+  }
+
+  .state-node.selected {
+    border-color: #ff9800;
+    background-color: #fff8e1;
+  }
+
+  /* 连线样式 (SVG) */
+  #connections-layer {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none; /* 让鼠标事件穿透SVG层 */
+    z-index: 1;
+  }
+
+  /* 工具栏 */
+  .toolbar {
+    margin-top: 15px;
+    padding: 10px;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    display: flex;
+    gap: 10px;
+    align-items: center;
+  }
+
+  .btn {
+    padding: 8px 16px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 500;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .btn-primary { background: #2d7be5; color: white; }
+  .btn-primary:hover { background: #1a5cba; }
+  
+  .btn-success { background: #28a745; color: white; }
+  .btn-success:hover { background: #218838; }
+
+  .btn-danger { background: #dc3545; color: white; }
+  .btn-danger:hover { background: #c82333; }
+
+  .btn-outline { background: white; border: 1px solid #ccc; color: #333; }
+  .btn-outline:hover { background: #f0f0f0; }
+
+  /* 重命名输入框 */
+  .rename-input {
+    width: 80px;
+    border: none;
+    border-bottom: 1px solid #2d7be5;
+    outline: none;
+    text-align: center;
+    font-size: 14px;
+    background: transparent;
+  }
+
+  /* 自定义右键菜单样式 */
+  #custom-menu {
+    display: none;
+    position: absolute;
+    z-index: 9999;
+    background: #fff;
+    border: 1px solid #ccc;
+    box-shadow: 0 2px 8px #aaa;
+    padding: 4px 0;
+    border-radius: 6px;
+  }
+
+  .menu-item {
+    padding: 6px 24px;
+    cursor: pointer;
+    font-size: 14px;
+  }
+
+  .menu-item:hover {
+    background: #e6f7ff;
+  }
+
+  /* 长按操作的样式： */
+
+  .state-node.pressing {
+    transform: scale(1.25);
+    box-shadow: 0 0 10px #90caf9;
+    background: #f5faff;
+    transition: transform 0.1s, box-shadow 0.1s, background 0.1s;
+    /* transition: all 0.2s; */
+}
+
+  .state-node.renameing {
+    transform: scale(1.5);
+    box-shadow: 0 0 20px #2d7be5;
+    background: #e3f2fd;
+    border: 2px solid #2d7be5;
+    transition: all 0.2s;
+}
+</style>
+
+
+<div class="state-container">
+  <div class="header-title">StateCore 状态机生成器</div>
+
+  <!-- 画布区域 -->
+  <div class="canvas-wrapper" id="canvas">
+    <!-- SVG层用于绘制连线 -->
+    <svg id="connections-layer"></svg>
+    <!-- 状态节点将通过JS插入到这里 -->
+  </div>
+
+  <!-- 底部工具栏 -->
+  <div class="toolbar">
+    <button class="btn btn-primary" onclick="addNewState()">
+      <span>+</span> 新增状态
+    </button>
+    <button class="btn btn-danger" onclick="deleteSelectedState()">
+      删除选中
+    </button>
+    <div style="flex: 1;"></div> <!-- 占位符，把后面的按钮推到右边 -->
+    <button class="btn btn-outline" onclick="importJson()">导入配置</button>
+    <button class="btn btn-outline" onclick="exportJson()">导出配置</button>
+    <button class="btn btn-success" onclick="generateCCode()">生成 C 代码</button>
+    
+    <!-- 隐藏的文件输入框 -->
+    <input type="file" id="jsonFileInput" style="display:'none'" accept=".json">
+  </div>
+
+  <!-- 自定义右键菜单 -->
+  <div id="custom-menu">
+    <div class="menu-item" data-action="add">新建状态</div>
+    <div class="menu-item" data-action="rename">重命名</div>
+    <div class="menu-item" data-action="connect">开始连线</div>
+  </div>
+</div>
+

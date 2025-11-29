@@ -1,0 +1,20 @@
+{
+  "name": "hostcomptest",
+  "version": "1.0.0",
+  "description": "",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "devDependencies": {
+    "electron": "^39.2.4"
+  },
+  "dependencies": {
+    "serialport": "^13.0.0"
+  }
+}

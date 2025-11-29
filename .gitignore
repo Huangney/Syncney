@@ -1,0 +1,39 @@
+# Node.js 依赖
+node_modules/
+
+# Electron 打包输出
+dist/
+build/
+out/
+
+# 日志文件
+*.log
+
+# 临时文件
+*.tmp
+*.temp
+
+# 系统文件
+.DS_Store
+Thumbs.db
+
+# VSCode 工作区配置
+.vscode/
+
+# 运行时缓存
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# 生成的代码或资源（如有）
+*.exe
+*.dll
+*.app
+*.asar
+
+# 个人配置
+.env
+.env.local
+.env.*.local
+
+# 其他你本地生成但不希望提交的文件夹或文件

@@ -1,0 +1,43 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    // 调试主进程（Node.js 环境，支持 port 属性）
+    {
+      "name": "调试主进程",
+      "type": "node",
+      "request": "launch",
+      "cwd": "${workspaceFolder}",
+      "runtimeExecutable": "${workspaceFolder}/node_modules/.bin/electron",
+      "runtimeArgs": [".", "--inspect"], // 简化调试参数，自动分配端口
+      "skipFiles": ["<node_internals>/**"] // 跳过 Node 内部文件
+    },
+
+    // 调试渲染进程（Chrome 环境，不支持 port 属性）
+    {
+      "name": "调试渲染进程",
+      "type": "chrome",
+      "request": "launch",
+      "url": "file://${workspaceFolder}/index.html", // 本地 HTML 文件路径
+      "webRoot": "${workspaceFolder}",
+      "runtimeExecutable": "${workspaceFolder}/node_modules/.bin/electron",
+      "runtimeArgs": [".", "--remote-debugging-port=9222"], // 渲染进程调试端口
+      // 移除 port 属性，Chrome 调试通过 remote-debugging-port 连接
+      "sourceMaps": true
+    },
+
+    // 联合调试（主进程 + 渲染进程）
+    {
+      "name": "联合调试",
+      "type": "node",
+      "request": "launch",
+      "cwd": "${workspaceFolder}",
+      "runtimeExecutable": "${workspaceFolder}/node_modules/.bin/electron",
+      "runtimeArgs": [
+        ".",
+        "--inspect=9229", // 主进程调试端口
+        "--remote-debugging-port=9222" // 渲染进程调试端口
+      ],
+      "postDebugTask": "kill-electron" // 可选：调试结束后杀死进程
+    }
+  ]
+}
