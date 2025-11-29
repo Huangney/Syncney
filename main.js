@@ -31,7 +31,7 @@ function createWindow() {
 
   win.loadFile('index.html')
   // 启动时自动打开 DevTools
-  win.webContents.openDevTools() 
+  // win.webContents.openDevTools() 
   console.log("窗口已创建") 
 }// 创建一个新窗口，窗口大小 800x600，加载 index.html 页面，并指定预加载脚本 preload.js
 
