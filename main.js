@@ -183,3 +183,12 @@ ipcMain.handle('select-file', async () =>
     if (result.canceled || result.filePaths.length === 0) return null;
     return result.filePaths[0];
 });
+ipcMain.handle('save-text', async (event, filePath, text) => {
+    try {
+        fs.writeFileSync(filePath, text, 'utf-8');
+        return true;
+    } catch (err) {
+        console.error('保存文件失败:', err);
+        return false;
+    }
+});

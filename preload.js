@@ -18,4 +18,5 @@ contextBridge.exposeInMainWorld('windowAPI', {
   readJson: (filePath) => ipcRenderer.invoke('read-json', filePath),
   selectFolder: () => ipcRenderer.invoke('select-folder'),
   selectFile: () => ipcRenderer.invoke('select-file'),
+  saveText: (filePath, text) => ipcRenderer.invoke('save-text', filePath, text),
 });

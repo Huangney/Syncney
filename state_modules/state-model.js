@@ -226,8 +226,121 @@ async function importJson() {
     import_StateCoreJson(filePath);
 }
 
+/**
+ * @description 根据状态机数据生成嵌入式C代码字符串
+ * @returns {string} C代码内容
+ */
+function generateCCode() 
+{
+    // TODO: 在这里组织你的C代码生成逻辑
+    let Core_Code_Hpp = ""
+    Core_Code_Hpp += "#pragma once\n";
+    Core_Code_Hpp += "#include \"StateCore.h\"\n\n";
+    Core_Code_Hpp += "/**\n";
+    Core_Code_Hpp += ` * @brief 命名空间：${statemachineName}_状态图\n`;
+    Core_Code_Hpp += " */\n";
+    Core_Code_Hpp += `namespace ${statemachineName}_SG\n`;
+    Core_Code_Hpp += "{\n";
+    Core_Code_Hpp += "    // 状态图实例\n";
+    Core_Code_Hpp += `    StateGraph graph;\n\n`;
+    Core_Code_Hpp += "    /// @brief 构建状态图\n";
+    Core_Code_Hpp += "    void BuildGraph()\n";
+    Core_Code_Hpp += "    }\n";
+
+    let Core_Code_Cpp = ""
+    Core_Code_Cpp += `#include \"${statemachineName}_StateGraph.hpp\"\n`;
+    Core_Code_Cpp += "/**\n";
+    Core_Code_Cpp += ` * @brief 由 Syncney 自动生成的状态图构建代码`
+    Core_Code_Cpp += " */\n\n";
+    Core_Code_Cpp += `#pragma region GeneratedCode\n`;
+    Core_Code_Cpp += `/***--<     状态函数定义    >--***/\n`;
+    // 生成状态函数定义
+    states.forEach(state => 
+    {
+        Core_Code_Cpp += `void ${state.funcName}(StateCore *core)\n`;
+    });
+    Core_Code_Cpp += `/***--<     构建状态图    >--***/\n`;
+    Core_Code_Cpp += `void ${statemachineName}_SG::BuildGraph()\n`;
+    Core_Code_Cpp += `{\n`;
+    // 添加状态
+    Core_Code_Cpp += `    // 添加状态\n`;
+    states.forEach(state => {
+        Core_Code_Cpp += `    auto ${state.name}_state = graph.AddState("${state.name}");\n`;
+    });
+    // 绑定状态函数
+    Core_Code_Cpp += `\n    // 绑定状态函数\n`;
+    states.forEach(state => {
+        Core_Code_Cpp += `    ${state.name}_state.StateAction = ${state.funcName};\n`;
+    });
+    // 添加状态链接
+    Core_Code_Cpp += `\n    // 添加状态链接\n`;
+    connections.forEach(conn => {
+        const fromState = states.find(s => s.id === conn.from);
+        const toState = states.find(s => s.id === conn.to);
+        if (fromState && toState)
+        {
+            Core_Code_Cpp += `    ${fromState.name}_state.LinkTo(${fromState.name}.Complete, &${toState.name}_state);\n`;
+        }
+    });
+    // 设置初始状态
+    Core_Code_Cpp += `\n    // 设置初始状态\n`;
+    Core_Code_Cpp += `    graph.executor_at_id = 0;\n`;
+    Core_Code_Cpp += `}\n`;
+    Core_Code_Cpp += `#pragma endregion\n`;
+
+    // 实现状态函数
+    states.forEach(state =>
+    {
+        Core_Code_Cpp += `\n/**\n`;
+        Core_Code_Cpp += ` * @brief 状态函数：${state.name}具体实现\n`;
+        Core_Code_Cpp += ` */\n`;
+        Core_Code_Cpp += `void ${state.funcName}(StateCore *core)\n`;
+        Core_Code_Cpp += `{\n`;
+        Core_Code_Cpp += `    // TODO: 用户自行编写\n`;
+        Core_Code_Cpp += `}\n`;
+    });
+
+    return {C_Code_Cpp : Core_Code_Cpp, C_Code_Hpp : Core_Code_Hpp};
+}
+
+/**
+ * @description 导出C代码到指定文件（同时保存 .cpp 和 .hpp 文件）
+ * @param {string} baseFilePath 保存路径（不带扩展名）
+ */
+async function exportCCode() 
+{
+    // 让用户选择文件夹
+    const folderPath = await window.windowAPI.selectFolder();
+    if (!folderPath)
+    {
+        showAlert("未选择文件夹，导出取消。");
+        return;
+    }
+
+    // 构造文件名，自动用 ${statemachineName}_Grapg.cpp和hpp 作为文件名
+    const cppFilePath = folderPath + "\\" + statemachineName + "_Graph.cpp";
+    const hppFilePath = folderPath + "\\" + statemachineName + "_Graph.hpp";
+
+    const cCode = generateCCode();
+
+    if (window.windowAPI && window.windowAPI.saveText) 
+    {
+        // 保存 .cpp 文件
+        window.windowAPI.saveText(cppFilePath, cCode.C_Code_Cpp);
+        // 保存 .hpp 文件
+        window.windowAPI.saveText(hppFilePath, cCode.C_Code_Hpp);
+        showAlert("C代码导出成功！");
+    } 
+    else 
+    {
+        showAlert("导出失败！");
+    }
+}
 
 
+// 暴露接口
+window.generateCCode = generateCCode;
+window.exportCCode = exportCCode;
 
 // 暴露给全局
 window.getStates = getStates;
