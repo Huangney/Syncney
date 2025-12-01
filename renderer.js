@@ -79,7 +79,8 @@ async function closePortAsync(Button, portSelect)
     isPortOpen = false;
 
     // 弹窗
-    showAlert("串口关闭成功");
+    // showAlert("串口关闭成功");
+    showToast("串口已关闭", 2000);
     // 恢复文本
     Button.textContent = "打开串口";
     // 解禁按钮
@@ -90,7 +91,8 @@ async function closePortAsync(Button, portSelect)
   }
   else
   {
-    showAlert("串口未打开或关闭失败");
+    // showAlert("串口未打开或关闭失败");
+    showToast("串口未打开或关闭失败", 2000);
     Button.disabled = false;
   }
 }

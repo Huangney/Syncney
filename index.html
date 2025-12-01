@@ -119,6 +119,29 @@
         cursor: pointer;
       }
 
+      /*----------- 通知Toast弹窗样式--------- */
+      #toast-notify {
+      display: none;
+      position: fixed;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      z-index: 99999;
+      min-width: 180px;
+      min-height: 60px;
+      background: #7f2f8e;
+      color: #fff;
+      border-radius: 8px;
+      box-shadow: 0 2px 12px #aaa;
+      padding: 12px 24px;
+      font-size: 1em;
+      transition: opacity 0.3s;
+      opacity: 0.9;
+      pointer-events: none;
+      text-align: center;      /* 字体居中 */
+      justify-content: center;  /* 水平居中 */
+      backdrop-filter: blur(8px); /* 毛玻璃效果 */
+      }
     </style>
   </head>
 
@@ -153,6 +176,10 @@
         <div id="custom-alert-msg"></div>
         <button id="custom-alert-btn">确定</button>
       </div>
+    </div>
+
+    <!-- 通知弹窗容器 -->
+    <div id="toast-notify">
     </div>
 
     <script src="./renderer.js"></script>

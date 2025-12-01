@@ -21,3 +21,19 @@ function showAlert(msg, callback)
     // 可选：自动聚焦按钮
     alertBtn.focus();
 }
+
+
+function showToast(msg, duration = 1000) 
+{
+  const toast = document.getElementById('toast-notify');
+  if (!toast) return;
+  toast.textContent = msg;
+  toast.style.display = 'block';
+  toast.style.opacity = '0.8';
+
+  // 自动消失（transition: 0.3s）
+  setTimeout(() => {
+    toast.style.opacity = '0';
+    setTimeout(() => { toast.style.display = 'none'; }, 300);
+  }, duration);
+}
