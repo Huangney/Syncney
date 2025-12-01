@@ -17,6 +17,8 @@
     </div>
 
     <div class="app-container">
+      <!-- 背景粒子画布（固定在 app-container 内） -->
+      <canvas id="bg-canvas" aria-hidden="true"></canvas>
       <!-- 悬浮侧边栏 -->
       <div id="sidebar">
         <!-- 切换按钮 -->
@@ -50,6 +52,7 @@
     <div id="toast-notify">
     </div>
 
+    <script src="./background_particles.js"></script>
     <script src="./renderer.js"></script>
     <script>
       document.getElementById('min-btn').onclick = () => window.windowAPI.minimize();

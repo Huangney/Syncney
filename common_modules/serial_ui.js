@@ -122,6 +122,9 @@ window.serial_UI = (function ()
                 select.appendChild(option);
         });
     }
+
+    // 额外将函数挂到 window，允许 inline onclick 与其它全局调用直接使用
+    window.togglePort = togglePort;
     
     // 暴露需要的 API，确保 window.serial_UI 为对象而非 undefined
     return {

@@ -1,0 +1,122 @@
+:root{
+  --glass-bg: 255,255,255;
+  --glass-alpha: 0.36;
+  --glass-border-alpha: 0.12;
+  --accent-start: #7f2f8e;
+  --accent-end: #d6df35;
+  --control-height: 44px;
+  --gap: 12px;
+}
+
+* { box-sizing: border-box; }
+
+.monitor-page{
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 100%;
+  padding: 18px;
+  gap: 12px;
+  font-family: sans-serif;
+  color: #222;
+}
+
+/* 中间消息区占据剩余空间 */
+.monitor-center{
+  flex: 1 1 auto;
+  overflow: auto;
+}
+
+.monitor-title{
+  font-size: 1.1rem;
+  margin: 0 0 8px 0;
+  color: var(--accent-start);
+  letter-spacing: 1px;
+}
+
+/* 消息卡片保持简单 */
+.messages-card{
+  background: rgba(255,255,255,0.6);
+  border-radius: 10px;
+  padding: 12px;
+  min-height: 120px;
+  max-height: calc(100vh - 300px);
+  overflow: auto;
+  border: 1px solid rgba(0,0,0,0.04);
+  box-shadow: 0 6px 18px rgba(0,0,0,0.06);
+}
+
+/* 底部毛玻璃容器：采用 flex 布局，自动黏底（monitor-page 为 column） */
+.monitor-bottom{
+  margin-top: auto;
+  display: flex;
+  gap: var(--gap);
+  align-items: center;
+  padding: 10px;
+  border-radius: 12px;
+  background: rgba(var(--glass-bg), var(--glass-alpha));
+  backdrop-filter: blur(7px);
+  -webkit-backdrop-filter: blur(7px);
+  border: 1px solid rgba(var(--glass-bg), var(--glass-border-alpha));
+  box-shadow: 0 8px 30px rgba(0,0,0,0.24);
+  align-self: stretch;
+}
+
+/* 单个控制组 */
+.control-group{
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+/* 行为按钮所在组拉伸，保持间距 */
+.control-action{ margin-left: auto; display:flex; gap:10px; align-items:center; }
+
+/* 统一控件样式（毛玻璃内的控件使用半透明背景）*/
+select, button {
+  height: var(--control-height);
+  min-width: 120px;
+  padding: 0 12px;
+  border-radius: 8px;
+  border: 1px solid rgba(0,0,0,0.06);
+  background: rgba(255,255,255,0.6);
+  cursor: pointer;
+  font-size: 14px;
+  color: #222;
+  outline: none;
+  transition: transform 0.12s ease, box-shadow 0.12s ease;
+}
+
+/* 下拉可稍薄 */
+select { padding-right: 24px; }
+
+/* 悬停与聚焦样式 */
+select:focus, button:focus {
+  box-shadow: 0 6px 18px rgba(127,47,142,0.08);
+}
+
+/* 按钮使用渐变强调色 */
+#toggle_port_button{
+  background: linear-gradient(90deg, var(--accent-start), var(--accent-end));
+  color: #fff;
+  border: none;
+  font-weight: 600;
+  min-width: 110px;
+}
+#toggle_port_button:hover{ transform: translateY(-2px); }
+
+/* 状态文本样式 */
+.status{
+  font-size: 13px;
+  color: rgba(0,0,0,0.6);
+}
+
+/* 小屏幕自适应：纵向排列控件 */
+@media (max-width: 720px){
+  .monitor-bottom{
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .control-action{ margin-left: 0; justify-content: flex-start; }
+  select, button{ width: 100%; }
+}

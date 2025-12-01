@@ -1,6 +1,6 @@
 async function MonitorPageInit() 
 {
-    port_select = document.getElementById("ports-list");
+    port_select = document.getElementById("port");
     window.serial_UI.refreshPortList(port_select);
 }
 

@@ -2,16 +2,35 @@ body {
     font-family: sans-serif;
     padding: 0;
     margin: 0;
-    background-color: #fcfcfc;
-    /* 给背景一个微弱的颜色，凸显毛玻璃 */
+
+    /* --- 修改：动态流动背景 --- */
+    /* 使用深色底(#0b1116) + 紫色暗部(#260e2b) + 黄绿暗部(#2b2d0b) 混合流动 */
+    /* 这样既呼应了粒子的颜色，又不会太亮导致刺眼 */
+    background: linear-gradient(
+        -45deg, 
+        #e1f2ff, 
+        #def0ff, 
+        #fdffdb   /* 基于 #d6df35 调暗 */
+    );
+    background-size: 400% 400%;
+    animation: gradientBG 18s ease infinite;
+    
+    color: #e6eef8;
     overflow: hidden;
-    /* 防止滚动条双重出现 */
 }
 
+/* 新增：背景流动动画关键帧 */
+@keyframes gradientBG {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
+/* 标题栏 -> 深色主题 */
 .titlebar {
     width: 100%;
     height: 36px;
-    background: #f5f5f5;
+    background: #eeeeee;
     color: #333;
     font-size: 18px;
     font-weight: bold;
@@ -60,7 +79,24 @@ body {
     overflow: hidden;
 }
 
+/* 新增：背景粒子画布样式 */
+#bg-canvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 0;
+    pointer-events: none; /* 让鼠标事件穿透画布，不影响下方操作 */
+}
+
 /* ----------- 悬浮毛玻璃侧边栏（修改） ----------- */
+:root 
+{
+    --sidebar-bg-opacity: 0.32;         /* 展开时透明度，修改此值来调整 */
+    --sidebar-collapsed-bg-opacity: 0.32; /* 折叠时透明度 */
+}
+
 #sidebar {
     position: fixed;
     top: 56px;
@@ -76,16 +112,17 @@ body {
     padding: 10px 0;
     box-sizing: border-box;
 
-    /* 加强透明与毛玻璃 */
-    background: rgba(206, 206, 206, 0.16);
-    backdrop-filter: blur(24px);
-    -webkit-backdrop-filter: blur(24px);
-    border: 1px solid rgba(206, 206, 206, 0.12);
-    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.12);
+    /* 使用 CSS 变量控制透明度，方便统一调整或 JS 动态修改 */
+    background: rgba(200, 200, 200, var(--sidebar-bg-opacity));
+    backdrop-filter: blur(7px);
+    -webkit-backdrop-filter: blur(7px);
+    border: 1px solid rgba(180, 180, 180, 0.12);
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.24);
     border-radius: 16px;
 
     /* 较短且一致的过渡时长，width/height/border-radius 同步 */
-    transition: height 0.5s cubic-bezier(0.25, 0.8, 0.25, 1),
+    transition: 
+        height 0.5s cubic-bezier(0.25, 0.8, 0.25, 1),
         width 0.4s cubic-bezier(0.25, 0.8, 0.25, 1),
         border-radius 0.4s cubic-bezier(0.25, 0.8, 0.25, 1),
         background 0.4s ease,
@@ -108,12 +145,14 @@ body {
     box-sizing: border-box;
 
     cursor: pointer;
-    background: rgba(214, 214, 214, 0.3);
+    /* 使用折叠时的透明度变量 */
+    background: rgba(214, 214, 214, var(--sidebar-collapsed-bg-opacity));
 
     /* 居中内部内容 */
     justify-content: center;
     align-items: center;
     -webkit-backdrop-filter: blur(24px);
+    backdrop-filter: blur(24px);
 
     /* 防止内容仍占位造成高度差异 */
     overflow: visible;
@@ -218,6 +257,10 @@ body {
     overflow-y: auto;
     /* 内容过多时滚动 */
 
+    /* 新增：确保内容在画布之上 */
+    position: relative;
+    z-index: 1;
+
     /* 为了不被悬浮的侧边栏遮挡内容，可以加一点左padding，
            或者让用户自己决定内容布局。这里为了美观，
            假设内容是居中的或者用户可以接受左上角被遮挡 */
@@ -291,8 +334,8 @@ body {
     font-weight: 500;
     letter-spacing: 0.5px;
     background: rgba(30, 30, 30, 0.36);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
+    backdrop-filter: blur(7px);
+    -webkit-backdrop-filter: blur(7px);
     border-radius: 12px;
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
     border: 1px solid rgba(255, 255, 255, 0.1);
