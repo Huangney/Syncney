@@ -69,6 +69,7 @@ function addNewState()
     const x = 50 + (states.length * 20) % 300;
     const y = 50 + (states.length * 20) % 200;
     states.push({ id, name: `STATE_${states.length}`, funcName: `Default`, x, y });
+    showToast("新状态添加成功！", 1500);
     renderStates();
 }
 
@@ -78,7 +79,7 @@ function addNewState()
 function deleteSelectedState()
 {
     if (!selectedStateId) {
-        showAlert("请先点击选中一个状态！");
+        showToast("请先点击选中一个状态！", 1500);
         return;
     }
     if (confirm("确定删除该状态吗？")) 
@@ -185,7 +186,7 @@ async function exportJson()
     const folderPath = await window.windowAPI.selectFolder();
     if (!folderPath)
     {
-        showAlert("未选择文件夹，导出取消。");
+        showToast("未选择文件夹，导出取消。");
         return;
     }
 
@@ -219,7 +220,7 @@ async function importJson() {
 
     if (!filePath)
     {
-        showAlert("未选择文件，导入取消。");
+        showToast("未选择文件，导入取消。");
         return;
     }
     // 调用导入函数
@@ -313,7 +314,7 @@ async function exportCCode()
     const folderPath = await window.windowAPI.selectFolder();
     if (!folderPath)
     {
-        showAlert("未选择文件夹，导出取消。");
+        showToast("未选择文件夹，导出取消。");
         return;
     }
 

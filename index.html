@@ -120,27 +120,43 @@
       }
 
       /*----------- 通知Toast弹窗样式--------- */
-      #toast-notify {
-      display: none;
-      position: fixed;
-      left: 50%;
-      top: 50%;
-      transform: translate(-50%, -50%);
-      z-index: 99999;
-      min-width: 180px;
-      min-height: 60px;
-      background: #7f2f8e;
-      color: #fff;
-      border-radius: 8px;
-      box-shadow: 0 2px 12px #aaa;
-      padding: 12px 24px;
-      font-size: 1em;
-      transition: opacity 0.3s;
-      opacity: 0.9;
-      pointer-events: none;
-      text-align: center;      /* 字体居中 */
-      justify-content: center;  /* 水平居中 */
-      backdrop-filter: blur(8px); /* 毛玻璃效果 */
+      #toast-notify 
+      {
+        /* 屏幕居中定位 */
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        z-index: 100000;
+
+        /* 初始状态：修正语法错误，添加透明度初始值 */
+        display: none;
+        opacity: 0;
+        
+        /* 关键：添加过渡动画，确保渐隐时毛玻璃效果平滑消失 */
+        transition: opacity 0.3s ease;
+        /* 性能优化：告诉浏览器 opacity 会变化，防止毛玻璃重绘闪烁 */
+        will-change: opacity;
+        
+        /* 布局与文字样式 */
+        padding: 20px 32px;
+        min-width: 180px;
+        max-width: 80%;
+        text-align: center;
+        color: #fff;
+        font-size: 16px;
+        font-weight: 500;
+        letter-spacing: 0.5px;
+        
+        /* 毛玻璃效果核心代码 */
+        background: rgba(30, 30, 30, 0.36);     /* 深色半透明背景 */
+        backdrop-filter: blur(12px);              /* 背景高斯模糊 */
+        -webkit-backdrop-filter: blur(12px);
+        
+        /* 圆角与阴影 */
+        border-radius: 12px;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3); /* 柔和的深阴影 */
+        border: 1px solid rgba(255, 255, 255, 0.1); /* 增加玻璃质感的微弱边框 */
       }
     </style>
   </head>
