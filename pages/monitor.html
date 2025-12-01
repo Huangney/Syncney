@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <title>监测机</title>
+</head>
+<body>
+  <div class="monitor-page">
+    <!-- 上方保留区域（你后续加入内容） -->
+    <div class="monitor-top"></div>
+
+    <!-- 中间：显示解码后消息的区域 -->
+    <div class="monitor-center">
+      <h3 style="margin:0 0 8px 0;">消息（已解码）</h3>
+      <div class="messages-card" aria-live="polite" aria-atomic="false">
+        <!-- JS 将把解码后的消息追加到此容器中 -->
+        <div id="message-log" role="log"></div>
+      </div>
+    </div>
+
+    <!-- 下方：串口列表、波特率、开启/关闭 -->
+    <div class="monitor-bottom">
+      <div class="control-group">
+        <label for="ports-list" class="status">串口：</label>
+        <select id="ports-list" class="ports-list">
+          <option value="" disabled selected>正在获取可用串口...</option>
+        </select>
+        <button id="refresh-ports-btn" title="刷新串口">刷新</button>
+      </div>
+
+      <div class="control-group">
+        <label for="baudrate-select" class="status">波特率：</label>
+        <select id="baudrate-select">
+          <option value="9600">9600</option>
+          <option value="19200">19200</option>
+          <option value="38400">38400</option>
+          <option value="57600">57600</option>
+          <option value="115200" selected>115200</option>
+          <option value="230400">230400</option>
+        </select>
+      </div>
+
+      <div class="control-group">
+        <button id="open-close-btn" data-open="false">打开端口</button>
+        <span id="port-status" class="status">状态：已关闭</span>
+      </div>
+
+      <!-- 占位，保持右侧留白 -->
+      <div style="flex:1"></div>
+    </div>
+  </div>
+</body>
+</html>
