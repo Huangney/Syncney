@@ -1,0 +1,299 @@
+body {
+    font-family: sans-serif;
+    padding: 0;
+    margin: 0;
+    background-color: #fcfcfc;
+    /* 给背景一个微弱的颜色，凸显毛玻璃 */
+    overflow: hidden;
+    /* 防止滚动条双重出现 */
+}
+
+.titlebar {
+    width: 100%;
+    height: 36px;
+    background: #f5f5f5;
+    color: #333;
+    font-size: 18px;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    padding-left: 16px;
+    -webkit-app-region: drag;
+    border-bottom: 1px solid #ddd;
+    box-sizing: border-box;
+    position: relative;
+    z-index: 2000;
+    /* 确保标题栏在最上层 */
+}
+
+.window-controls {
+    position: absolute;
+    right: 12px;
+    top: 0;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    -webkit-app-region: no-drag;
+}
+
+.window-controls button {
+    width: 32px;
+    height: 32px;
+    margin-left: 4px;
+    border: none;
+    background: transparent;
+    font-size: 18px;
+    cursor: pointer;
+    border-radius: 4px;
+    transition: background 0.2s;
+}
+
+.window-controls button:hover {
+    background: #eee;
+}
+
+/* ----------- 布局容器 ----------- */
+.app-container {
+    position: relative;
+    width: 100%;
+    height: calc(100vh - 36px);
+    overflow: hidden;
+}
+
+/* ----------- 悬浮毛玻璃侧边栏（修改） ----------- */
+#sidebar {
+    position: fixed;
+    top: 56px;
+    /* 与标题栏保持间隙 */
+    left: 16px;
+
+    /* (关键) 不再使用 top+bottom 来决定高度，而是用显式数值，便于 transition */
+    height: calc(100vh - 56px - 20px);
+    /* 窗口高度 - 顶部间隙 - 底部间隙 */
+    width: 200px;
+    z-index: 1000;
+
+    padding: 10px 0;
+    box-sizing: border-box;
+
+    /* 加强透明与毛玻璃 */
+    background: rgba(206, 206, 206, 0.16);
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+    border: 1px solid rgba(206, 206, 206, 0.12);
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.12);
+    border-radius: 16px;
+
+    /* 较短且一致的过渡时长，width/height/border-radius 同步 */
+    transition: height 0.5s cubic-bezier(0.25, 0.8, 0.25, 1),
+        width 0.4s cubic-bezier(0.25, 0.8, 0.25, 1),
+        border-radius 0.4s cubic-bezier(0.25, 0.8, 0.25, 1),
+        background 0.4s ease,
+        transform 0.4s ease;
+    will-change: width, height, border-radius, transform;
+    overflow: hidden;
+
+    display: flex;
+    flex-direction: column;
+}
+
+/* 折叠状态样式 (左上角小球) */
+#sidebar.collapsed {
+    /* 目标：明确的数值高度/宽度，便于平滑过渡成正圆 */
+    width: 48px;
+    height: 48px;
+    /* 关键：使用像素值，等于 48/2 = 24px，避免 50% 在中间帧变成椭圆 */
+    border-radius: 24px;
+    padding: 0;
+    box-sizing: border-box;
+
+    cursor: pointer;
+    background: rgba(214, 214, 214, 0.3);
+
+    /* 居中内部内容 */
+    justify-content: center;
+    align-items: center;
+    -webkit-backdrop-filter: blur(24px);
+
+    /* 防止内容仍占位造成高度差异 */
+    overflow: visible;
+}
+
+/* 鼠标悬停在小球上时稍微变大/变亮 */
+#sidebar.collapsed:hover {
+    background: rgba(255, 255, 255, 0.8);
+    transform: scale(1.05);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+}
+
+/* 侧边栏内部列表 */
+#sidebar ul {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+    opacity: 1;
+    transition: opacity 0.2s ease;
+    /* 防止折叠过程中文字换行导致布局跳动 */
+    white-space: nowrap;
+}
+
+/* 折叠时隐藏列表内容 */
+#sidebar.collapsed ul {
+    opacity: 0;
+    pointer-events: none;
+    position: absolute;
+    /* 彻底移出布局流 */
+}
+
+#sidebar li {
+    padding: 12px 24px;
+    cursor: pointer;
+    font-size: 14px;
+    color: #444;
+    transition: background 0.2s;
+    display: flex;
+    align-items: center;
+}
+
+#sidebar li:hover {
+    background: rgba(0, 0, 0, 0.05);
+    color: #000;
+}
+
+/* 切换按钮 (汉堡菜单图标) */
+.sidebar-toggle-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 40px;
+    cursor: pointer;
+    font-size: 20px;
+    color: #555;
+    margin-bottom: 5px;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+/* 折叠状态下的切换按钮：居中显示在球里 */
+#sidebar.collapsed .sidebar-toggle-btn {
+    height: 100%;
+    width: 100%;
+    border-bottom: none;
+    margin: 0;
+}
+
+/* 展开时菜单文字更大更粗，折叠时保持原样 */
+#sidebar:not(.collapsed) ul {
+    font-size: 16px;
+    /* 整体文字尺寸 */
+    font-weight: 600;
+    /* 字重 */
+    line-height: 1.6;
+    /* 行高，提升可读性 */
+}
+
+#sidebar:not(.collapsed) li {
+    padding: 14px 24px;
+    /* 稍微加高可点击区域 */
+    font-size: inherit;
+    font-weight: inherit;
+    color: #2e2e2e;
+}
+
+/* 保持折叠态小球里的文字/图标不变 */
+#sidebar.collapsed .sidebar-toggle-btn,
+#sidebar.collapsed ul {
+    font-size: 14px;
+    font-weight: 500;
+}
+
+/* ----------- 主内容区域 ----------- */
+#main-content {
+    /* 关键：不再受侧边栏影响，占满剩余空间 */
+    margin-left: 0;
+    padding: 20px;
+    width: 100%;
+    height: 100%;
+    box-sizing: border-box;
+    overflow-y: auto;
+    /* 内容过多时滚动 */
+
+    /* 为了不被悬浮的侧边栏遮挡内容，可以加一点左padding，
+           或者让用户自己决定内容布局。这里为了美观，
+           假设内容是居中的或者用户可以接受左上角被遮挡 */
+    padding-left: 80px;
+    /* 留出小球的空间，避免初始遮挡太严重 */
+    transition: padding-left 0.4s ease;
+}
+
+/*----------- 自定义弹窗样式 (保持不变) --------- */
+#custom-alert {
+    display: none;
+    position: fixed;
+    left: 0;
+    top: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: 99999;
+    background: rgba(0, 0, 0, 0.15);
+}
+
+#custom-alert>div {
+    position: absolute;
+    left: 50%;
+    top: 40%;
+    transform: translate(-50%, -50%);
+    background: #fff;
+    border-radius: 10px;
+    box-shadow: 0 2px 16px #aaa;
+    padding: 32px 24px 16px 24px;
+    min-width: 220px;
+    text-align: center;
+}
+
+#custom-alert-msg {
+    font-size: 1.1em;
+    margin-bottom: 18px;
+}
+
+#custom-alert-btn {
+    padding: 6px 24px;
+    border-radius: 6px;
+    border: none;
+    background: #7f2f8e;
+    color: #fff;
+    font-size: 1em;
+    cursor: pointer;
+}
+
+/*----------- 通知Toast弹窗样式 (保持不变) --------- */
+#toast-notify {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 100000;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    pointer-events: none;
+    display: none;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    will-change: opacity;
+    padding: 20px 32px;
+    min-width: 180px;
+    max-width: 80%;
+    text-align: center;
+    color: #fff;
+    font-size: 16px;
+    font-weight: 500;
+    letter-spacing: 0.5px;
+    background: rgba(30, 30, 30, 0.36);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-radius: 12px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
