@@ -195,7 +195,82 @@ function initStateGen()
         });
     }
 
+    function onKeyDown(e) 
+    {
+      // 忽略带修饰键的组合（避免冲突）
+      if (e.ctrlKey || e.metaKey || e.altKey) return;
+
+      const active = document.activeElement;
+      const typingEl = active && (
+        active.tagName === 'INPUT' ||
+        active.tagName === 'TEXTAREA' ||
+        active.isContentEditable
+      );
+
+      if (typingEl) return; // 在输入状态不要触发快捷键
+
+      const key = (e.key || '').toLowerCase();
+      
+      console.log("按下了键：", key);
+      // Delete 键：删除选中状态
+      FastKeyDelete(key, e);
+
+      // F 键：在选中状态上开始 / 取消 pending 连接
+      FastKeyF(key, e);
+    }
+
+    // 注册页面快捷键监听（可被 cleanupPageShortcuts 移除）
+    if (typeof window.registerPageShortcut === 'function') 
+    {
+        window.registerPageShortcut('keydown', onKeyDown, false, document);
+    }
+    else
+    {
+        document.addEventListener('keydown', onKeyDown);
+    }
+  
+
     renderAll();
+}
+
+
+function FastKeyDelete(key, e)
+{
+    // Delete 键：删除选中状态
+    if (key === 'delete')
+    {
+    if (typeof deleteSelectedState === 'function') {
+        e.preventDefault();
+        deleteSelectedState();
+    }
+    return;
+    }
+}
+
+function FastKeyF(key, e)
+{
+    // F 键：在选中状态上开始 / 取消 pending 连接（仅限 StateGenerate 页面）
+    if (key === 'f')
+    {
+    e.preventDefault();
+
+    // 如果已有 pending 连接，则按 F 取消它
+    if (window.pendingConnectionSource)
+    {
+        stopPendingConnection();
+        return;
+    }
+
+    if (selectedStateId)
+    {
+        startPendingConnection(selectedStateId);
+    }
+    else
+    {
+        showToast && showToast("请先选中一个状态再按 F 创建连接", 1500);
+    }
+    return;
+    }
 }
 
 

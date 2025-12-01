@@ -131,6 +131,9 @@ async function refreshPortList()
  */
 async function switchPage(page)
 {
+  // 先清理任何页面短键/全局监听，确保新页面干净
+  cleanupPageShortcuts();
+  
   // 获取右侧主内容区
   const main = document.getElementById("main-content");
 
@@ -139,19 +142,19 @@ async function switchPage(page)
 
   if (page === "serial")
   {
-    pageFile = "serial.html";
+    pageFile = "pages/serial.html";
   }
   else if (page === "setting")
   {
-    pageFile = "setting.html";
+    pageFile = "pages/setting.html";
   }
   else if (page === "state_generate")
   {
-    pageFile = "state_generate.html";
+    pageFile = "pages/state_generate.html";
   }
   else if (page === "about")
   {
-    pageFile = "about.html";
+    pageFile = "pages/about.html";
   }
   else return;
 
@@ -214,6 +217,38 @@ async function switchPage(page)
     if (typeof window.initStateGen === 'function') window.initStateGen();
   }
 }
+
+/**
+ * 简洁通用的清理函数：移除通过 registerPageListener 注册的监听，
+ * 以及若干常见的 window 上残留 handler 引用（尝试移除后删除引用）。
+ */
+// target 默认为 document
+function registerPageShortcut(type, handler, options, target) {
+  if (!window._pageShortcuts) window._pageShortcuts = [];
+  const t = target || document;
+  t.addEventListener(type, handler, options);
+  window._pageShortcuts.push({ type, handler, options, target: t });
+  return handler;
+}
+
+function unregisterPageShortcut(handler) {
+  if (!Array.isArray(window._pageShortcuts)) return;
+  const idx = window._pageShortcuts.findIndex(s => s.handler === handler);
+  if (idx === -1) return;
+  const s = window._pageShortcuts.splice(idx, 1)[0];
+  try { s.target.removeEventListener(s.type, s.handler, s.options); } catch (e) {}
+}
+
+function cleanupPageShortcuts() {
+  if (!Array.isArray(window._pageShortcuts)) return;
+  window._pageShortcuts.forEach(s => {
+    try { s.target.removeEventListener(s.type, s.handler, s.options); } catch (e) {}
+  });
+  window._pageShortcuts.length = 0;
+}
+
+
+
 
 
 // 页面加载时默认注入串口助手页面
