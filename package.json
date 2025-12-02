@@ -4,6 +4,7 @@
   "description": "",
   "main": "main.js",
   "build": {
+    "asar": true,
     "appId": "com.example.serialtool",
     "productName": "Syncney",
     "files": [

@@ -15,7 +15,7 @@ body {
     background-size: 400% 400%;
     animation: gradientBG 18s ease infinite;
     
-    color: #e6eef8;
+    color: #e6eef8 !important;
     overflow: hidden;
 }
 
@@ -297,6 +297,7 @@ body {
 #custom-alert-msg {
     font-size: 1.1em;
     margin-bottom: 18px;
+    color: #000;
 }
 
 #custom-alert-btn {

@@ -52,7 +52,8 @@ window.serial_UI = (function ()
     {
         // 给标志位置位
         isPortOpen = true;
-        
+
+        showToast("串口打开成功", 2000);
         const port_list = document.getElementById("port");
         Button.textContent = "关闭串口";
         Button.disabled = false;

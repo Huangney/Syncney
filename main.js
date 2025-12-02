@@ -32,9 +32,12 @@ function createWindow() {
   win.loadFile('index.html')
   // 启动时自动打开 DevTools
   // win.webContents.openDevTools() 
+
   // 监听 F12 打开 DevTools
-  win.webContents.on('before-input-event', (event, input) => {
-      if (input.key === 'F12' && input.type === 'keyDown') {
+  win.webContents.on('before-input-event', (event, input) => 
+  {
+      if (input.key === 'F12' && input.type === 'keyDown') 
+      {
           win.webContents.openDevTools();
       }
   });
@@ -77,7 +80,8 @@ function handleOpenPort(event, config)
  * @brief 获取串口列表
  * @returns {Array} 串口信息数组
  */
-async function handleListPorts() {
+async function handleListPorts() 
+{
   const ports = await SerialPort.list();
   // 返回格式：[{ path: 'COM3', manufacturer: '...', ... }, ...]
   return ports;

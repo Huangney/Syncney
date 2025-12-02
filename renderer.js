@@ -173,7 +173,10 @@ window.onload = () => switchPage('serial');
 
 window.serialAPI.onData((msg) => {
   const recv = document.getElementById("recv");
-  recv.value += msg;
+  // 修复：增加判空，防止在非串口助手页面（如Monitor页面）报错
+  if (recv) {
+    recv.value += msg;
+  }
 });
 
 function sendData() {
